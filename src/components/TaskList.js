@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Text, View, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+	Text, View, StyleSheet, TouchableOpacity
+} from 'react-native';
+
 import * as Animatable from 'react-native-animatable';
 
 export default function TaskList({ data, handleDelete }) {
@@ -8,6 +11,7 @@ export default function TaskList({ data, handleDelete }) {
 			style={styles.container}
 			animation="bounceIn"
 			useNativeDriver >
+
 			{/* O ITEM FUNCIONA COMO UM BOTÃO */}
 			<TouchableOpacity
 				onPress={() => handleDelete(data)}
@@ -40,11 +44,11 @@ const styles = StyleSheet.create({
 	},
 
 	clLow: {
-		backgroundColor: '#FFD700'
+		backgroundColor: '#FFD700',
 	},
 
 	clMedium: {
-		backgroundColor: '#ffa500'
+		backgroundColor: '#ffa500',
 	},
 
 	clHigh: {
@@ -74,7 +78,7 @@ const styles = StyleSheet.create({
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 	},
-
+	
 	task: {
 		flex: 1,
 		color: '#121212',

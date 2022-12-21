@@ -1,16 +1,13 @@
 import React, { Component } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
-  StyleSheet,
-  Text, View,
-  TouchableOpacity,
-  TextInput, FlatList,
-  SafeAreaView
+  StyleSheet, Text, View, TouchableOpacity, TextInput, FlatList, SafeAreaView
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
 import RNPickerSelect from 'react-native-picker-select';
 import TaskList from './TaskList';
 import ProgressLoader from 'rn-progress-loader';
+import { database } from './../../config/FirebaseConfig';
 
 class Tela extends Component {
   constructor(props) {
@@ -23,89 +20,87 @@ class Tela extends Component {
     });
   }
 
-  /* EXECUTA QUANDO ENTRA */
   componentDidMount() {
+    {/* EXECUTA QUANDO ENTRA */ }
     var newThis = this;
     newThis.listToDo()
   }
 
+  // Lista os items 
   listToDo = async () => {
-    {/* REQUISIÇÃO PARA ADICIONAR UMA ATIVIDADE */ }
-    await fetch('https://www.todo.site.com/listarAtividades.php', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: 39158 })
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        this.setState({
-          task: res,
-          loading: false
+    this.setState({
+      task: [],
+      loading: true
+    });
+    // Recebe os items do Firebase 
+    await database.firestore().collection('atividades').get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          // Cria um objeto para cada item
+          const res = {
+            id: doc.id,
+            item: doc.data().item,
+            priority: doc.data().priority
+          }
+          // Adiciona lista todo          
+          this.setState({
+            task: [res, ...this.state.task],
+          });
         });
       })
-      .catch((error) => {
-        console.error(error);
+      .catch((err) => {
+        console.log('Error getting documents', err);
       });
+    // Para o loading
+    this.setState({ loading: false });
   }
 
-  handleAdd = () => {
+  // Adiciona um item na lista de todo
+  handleAdd = async () => {
+    // Alertas para campos vazios
     if (this.state.input == '') return alert('Preencha o campo');
     if (this.state.select == 9) return alert('Selecione a prioridade');
 
+    // Inicia o loading
     this.setState({ loading: true });
 
-    {/* REQUISIÇÃO PARA APAGAR UMA ATIVIDADE */ }
-    fetch('https://www.todo.site.com/cadastrarAtividade.php', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
+    //Cria o Id para o Firebase
+    var id = new Date();
+
+    // Referencia o coleção dentro do Firebase
+    const refTodo = database.firestore().collection("atividades");
+    try {
+      // Adiciona o item
+      await refTodo.doc(id.toString()).set({
         item: this.state.input,
         priority: this.state.select
-      }),
-    }).then((response) => response.json())
-      .then((res) => {
-        if (res == 1) {
-          this.setState({
-            input: '',
-            loading: true
-          });
-          this.listToDo();
-        }
-      })
-      .catch((error) => {
-        console.error(error);
       });
+
+      // Limpa o campo do input
+      this.setState({
+        input: '',
+      })
+
+      // Lista novamente
+      this.listToDo();
+    } catch (error) {
+      console.log("Error adding document: ", error)
+    }
   }
 
-  handleDelete = (item) => {
-
+  // Elimina um item da lista de Todo
+  handleDelete = async (item) => {
+    // Ativa o loading
     this.setState({ loading: true });
-
-    fetch('https://www.todo.site.com/excluirAtividade.php', {
-      method: 'POST',
-      headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token: 39158,
-        id: item.id
-      }),
-    })
-      .then((response) => response.json())
-      .then((res) => {
-        if (res == 1) {
-          this.setState({
-            loading: true
-          })
-          this.listToDo();
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    // Ligação do Firebase 
+    await database.firestore().collection('atividades').doc(item.id).delete();
+    // Lista novamente
+    this.listToDo();
   };
 
   render() {
     return (
-      <SafeAreaView style={styles.container} >
+     <SafeAreaView style={styles.container} >
         <StatusBar style="dark" />
         {/* Header*/}
         <View style={styles.content}>
@@ -148,6 +143,7 @@ class Tela extends Component {
 
         {/* SELECIONA A PRIORIDADE*/}
         <View style={styles.selector}>
+
           <Text style={styles.labelSelect}>Selecione a prioridade</Text>
           <RNPickerSelect
             placeholder={{
@@ -180,7 +176,7 @@ class Tela extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF'
+    backgroundColor: '#FFF',
   },
 
   title: {
@@ -211,7 +207,6 @@ const styles = StyleSheet.create({
   lista: {
     flexDirection: 'column',
     flex: 3
-
   },
 
   labelSelect: {
