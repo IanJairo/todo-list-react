@@ -13,14 +13,14 @@
 |-----------------------------------------------------------|
 | - [ x ] Text Box                                          |
 | - [ x ] Priority selector                                 |
-| - [ x ] List of tasks with colors according to priority   |s
+| - [ x ] List of tasks with colors according to priority   |
 | - [ x ] Press on the task to mark it as done              |
 
 
 ## Technologies Employed:  
 
 <p>
-<img src="https://res.cloudinary.com/practicaldev/image/fetch/s--5N472VlU--/c_imagga_scale,f_auto,fl_progressive,h_900,q_auto,w_1600/https://repository-images.githubusercontent.com/65750241/79017180-d4ce-11e9-9955-3f0a7be00c7a" height="100" width="100">
-<img src="https://assets.stickpng.com/images/5847f40ecef1014c0b5e488a.png" height="100" width="100"><br>
+<img src="https://www.pngfind.com/pngs/m/122-1222517_react-hexagon-react-png-transparent-png.png" height="100" width="100">
+<img src="https://e7.pngegg.com/pngimages/119/167/png-clipart-firebase-cloud-messaging-google-developers-software-development-kit-google-angle-triangle-thumbnail.png" height="100" width="100"><br>
 </p>
 
